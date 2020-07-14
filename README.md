@@ -4,6 +4,7 @@ API для кодера TChat - кодирует текст, файл, и т.д 
 
 ``` C#
 TChat.Coder.API.Main coder = new TChat.Coder.API.Main();
+
 //...
 
 string a =   coder.Encode("blablabla", "pass"); //Шифровка
