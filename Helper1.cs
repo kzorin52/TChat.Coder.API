@@ -1,33 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TChat.Coder.API
 {
-    class Helper1
+    internal class Helper1
     {
-     
-        static public string Pass = "P@@Sw0rd";
-        static readonly string SaltKey = "S@LT&KEY";
-        static readonly string VIKey = "@1B2c3D4e5F6g7H8";
-     
+        public static string Pass = "P@@Sw0rd";
+        private static readonly string SaltKey = "S@LT&KEY";
+        private static readonly string VIKey = "@1B2c3D4e5F6g7H8";
+
         /// <summary>
-        ///Шифрует строку. Возвращает строку в кодировке base64
+        ///     Шифрует строку. Возвращает строку в кодировке base64
         /// </summary>
         /// <param name="plainText">Входной текст</param>
         /// <returns></returns>
         public static string Encrypt(string plainText)
         {
-            byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
 
-            byte[] keyBytes = new Rfc2898DeriveBytes(Pass, Encoding.ASCII.GetBytes(SaltKey)).GetBytes(256 / 8);
-            var symmetricKey = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
+            var keyBytes = new Rfc2898DeriveBytes(Pass, Encoding.ASCII.GetBytes(SaltKey)).GetBytes(256 / 8);
+            var symmetricKey = new RijndaelManaged {Mode = CipherMode.CBC, Padding = PaddingMode.Zeros};
             var encryptor = symmetricKey.CreateEncryptor(keyBytes, Encoding.ASCII.GetBytes(VIKey));
-			
+
             byte[] cipherTextBytes;
 
             using (var memoryStream = new MemoryStream())
@@ -39,27 +35,30 @@ namespace TChat.Coder.API
                     cipherTextBytes = memoryStream.ToArray();
                     cryptoStream.Close();
                 }
+
                 memoryStream.Close();
             }
+
             return Convert.ToBase64String(cipherTextBytes);
         }
+
         /// <summary>
-        ///Расшифровывает строку в кодировке Base64, возвращает string
+        ///     Расшифровывает строку в кодировке Base64, возвращает string
         /// </summary>
         /// <param name="encryptedText">Шифрованный текст в формате Base64</param>
         /// <returns></returns>
         public static string Decrypt(string encryptedText)
         {
-            byte[] cipherTextBytes = Convert.FromBase64String(encryptedText);
-            byte[] keyBytes = new Rfc2898DeriveBytes(Pass, Encoding.ASCII.GetBytes(SaltKey)).GetBytes(256 / 8);
-            var symmetricKey = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.None };
+            var cipherTextBytes = Convert.FromBase64String(encryptedText);
+            var keyBytes = new Rfc2898DeriveBytes(Pass, Encoding.ASCII.GetBytes(SaltKey)).GetBytes(256 / 8);
+            var symmetricKey = new RijndaelManaged {Mode = CipherMode.CBC, Padding = PaddingMode.None};
 
             var decryptor = symmetricKey.CreateDecryptor(keyBytes, Encoding.ASCII.GetBytes(VIKey));
             var memoryStream = new MemoryStream(cipherTextBytes);
             var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);
-            byte[] plainTextBytes = new byte[cipherTextBytes.Length];
+            var plainTextBytes = new byte[cipherTextBytes.Length];
 
-            int decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
+            var decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
             memoryStream.Close();
             cryptoStream.Close();
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount).TrimEnd("\0".ToCharArray());

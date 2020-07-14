@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 
 namespace TChat.Coder.API
 {
@@ -11,7 +10,6 @@ namespace TChat.Coder.API
         [STAThread]
         private static void Main()
         {
-
         }
     }
 }
